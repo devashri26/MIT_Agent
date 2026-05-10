@@ -1,0 +1,19 @@
+{
+  "documents_processed": 934,
+  "chunks_generated": 1893,
+  "avg_chunk_tokens": 354.57,
+  "max_chunk_tokens": 1000,
+  "min_chunk_tokens": 40,
+  "content_type_distribution": {
+    "BLOG": 426,
+    "CURRICULUM": 140,
+    "EVENT": 70,
+    "FACULTY_PROFILE": 396,
+    "FAQ": 282,
+    "GENERAL": 560,
+    "PLACEMENT_STATS": 19
+  },
+  "rejected_chunks": 9,
+  "boilerplate_removed": 9,
+  "tiny_chunks_merged": 125
+}

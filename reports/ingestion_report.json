@@ -1,0 +1,26 @@
+{
+  "stats": {
+    "csv_rows": 1764,
+    "processed": 934,
+    "duplicates_removed": 107,
+    "failed_rows": 723,
+    "skipped_rows": 0,
+    "empty_content": 0,
+    "invalid_titles": 203,
+    "invalid_departments": 0,
+    "invalid_page_types": 0,
+    "malformed_html": 0,
+    "output_path": "datasets\\processed_documents.json",
+    "report_path": "reports\\ingestion_report.json"
+  },
+  "validation_summary": {
+    "title_warning": 601,
+    "clean_content_warning": 263
+  },
+  "integrity": {
+    "csv_rows": 1764,
+    "accounted_rows": 1764,
+    "rows_balance": 0,
+    "is_balanced": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "total_pages": 934,
+  "low_content_pages": 263,
+  "duplicate_pages": 438,
+  "mismatched_pages": 423,
+  "boilerplate_removals": 0,
+  "extraction_failures": 723,
+  "page_type_distribution": {
+    "Admissions": 147,
+    "Blog": 138,
+    "CourseStructure": 17,
+    "Curriculum": 21,
+    "Department": 411,
+    "DirectoryIndex": 21,
+    "Events": 51,
+    "Faculty": 12,
+    "General": 57,
+    "Placements": 11,
+    "Research": 48
+  },
+  "validation_summary": {
+    "title_warning": 601,
+    "clean_content_warning": 263
+  },
+  "quality_warning_distribution": {
+    "directory_listing": 21,
+    "duplicate_content": 331,
+    "low_content": 263,
+    "low_page_type_confidence": 266,
+    "title_content_mismatch": 423
+  }
+}

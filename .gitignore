@@ -1,0 +1,17 @@
+.env
+*.pyc
+__pycache__/
+.venv/
+venv/
+node_modules/
+dist/
+.DS_Store
+vector_store/faiss_index/*.json
+backend/uploads/
+*.egg-info/
+.pytest_cache/
+pytest-cache-files-*/
+datasets/test_processed_documents.json
+datasets/test_processed_documents.ndjson
+reports/test/
+datasets/test_bm25_chunks.jsonl
