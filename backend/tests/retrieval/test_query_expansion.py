@@ -48,3 +48,10 @@ def test_expansion_maps_fees_to_tuition() -> None:
 def test_expansion_maps_department_to_school() -> None:
     _, expanded = expand_query("computer department")
     assert "school" in expanded
+
+
+def test_expansion_handles_nac_typo() -> None:
+    """Regression: user typed 'nac graded' (missing one 'a'). Map nac→naac so retrieval
+    still finds the accreditation chunks."""
+    _, expanded = expand_query("is the college nac graded")
+    assert "naac" in expanded

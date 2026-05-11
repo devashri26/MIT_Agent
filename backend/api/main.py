@@ -311,7 +311,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
         messages=[LLMMessage(role="user", content=user_message)],
         model=request.model or provider.default_model,
         temperature=0.0,
-        max_tokens=1500,
+        max_tokens=500,
     )
 
     def event_stream():

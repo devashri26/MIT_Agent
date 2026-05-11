@@ -74,7 +74,12 @@ _INTENT_RULES: list[tuple[str, str, list[str], list[str]]] = [
     (
         r"\bevents?\b|\bfest\b|\bworkshops?\b|\bsymposi(um|a)\b|\bcompetitions?\b|\bnotice\b|\bcircular\b",
         "event_query",
-        ["Events", "Notices"],
+        # Workshops, expert talks, STTPs, hackathons appear on Programs (department pages),
+        # Faculty (individual professor activity), Club (technical clubs run workshops),
+        # and General (news/events) pages — not just dedicated Events pages. Events has
+        # only 8 chunks total so a strict filter starves the retrieval. The retrieval
+        # priority weights still keep dedicated Events pages above general mentions.
+        ["Events", "Notices", "Programs", "Faculty", "Club", "General"],
         ["events"],
     ),
     (
@@ -95,6 +100,12 @@ _ALL_HIGH_VALUE_PAGE_TYPES = [
     "Facilities",
     "Research",
     "Club",
+    # Blog included for generic "what do you know about X" questions: blogs often have
+    # explanatory content (e.g. MHT-CET counselling guides explaining spot rounds) that
+    # specific page types lack. Blog has retrieval_priority=0.4 so it gets downweighted —
+    # it won't dominate unless nothing else matches.
+    "Blog",
+    "General",
 ]
 
 

@@ -13,13 +13,13 @@ GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 class GroqProvider(BaseLLMProvider):
     """Groq via the OpenAI-compatible API (uses the `openai` SDK with a Groq base_url).
 
-    Free tier limits are much higher than Gemini: ~30 RPM and up to 14,400 RPD on
-    llama-3.1-8b-instant. Default model is llama-3.3-70b-versatile for quality;
-    switch to llama-3.1-8b-instant in the request body if you hit per-minute caps.
+    Default model is llama-3.1-8b-instant: 30 RPM, ~30K TPM, 14,400 RPD on free tier.
+    Pass model='llama-3.3-70b-versatile' for higher quality (tighter limits: 12K TPM,
+    1,000 RPD on free tier).
     """
 
     name = "groq"
-    default_model = "llama-3.3-70b-versatile"
+    default_model = "llama-3.1-8b-instant"
 
     def __init__(self, api_key: str | None = None, default_model: str | None = None) -> None:
         from openai import OpenAI

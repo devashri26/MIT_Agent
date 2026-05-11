@@ -83,3 +83,11 @@ def test_placement_query_still_works_without_leadership_words() -> None:
     route = IntentRouter().route("mechanical placement statistics")
     assert route.intent == "placement_query"
     assert route.allowed_page_types == ["Placements"]
+
+
+def test_general_query_includes_blog_for_explanatory_content() -> None:
+    """Regression: 'what do you know about spot round admission' is generic and
+    explanatory content lives in Blog page_types (MHT-CET counselling guides).
+    general_query must include Blog so this content surfaces."""
+    route = IntentRouter().route("MITAOE Alandi Pune")
+    assert "Blog" in route.allowed_page_types

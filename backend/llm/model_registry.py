@@ -4,7 +4,11 @@ import os
 
 
 DEFAULT_MODELS: dict[str, str] = {
-    "groq": "llama-3.3-70b-versatile",
+    # 8b-instant has 14,400 RPD on Groq free tier (vs 1,000 for 70b) plus higher TPM
+    # headroom. Quality is slightly lower but grounded RAG doesn't need 70b reasoning.
+    # Pass "model": "llama-3.3-70b-versatile" in the request body if you specifically
+    # want the bigger model and you're OK with tighter limits.
+    "groq": "llama-3.1-8b-instant",
     "gemini": "gemini-2.5-flash",
     "anthropic": "claude-sonnet-4-6",
     "openai": "gpt-4.1-mini",

@@ -231,7 +231,7 @@ CHAT_UI_HTML = """
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           query, session_id: sessionId, top_k: 7, candidate_pool: 20,
-          token_budget: 5000, run_judge: judgeToggle.checked,
+          token_budget: 3000, run_judge: judgeToggle.checked,
         }),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -251,7 +251,7 @@ CHAT_UI_HTML = """
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           query, session_id: sessionId, top_k: 7, candidate_pool: 20,
-          token_budget: 5000, run_judge: false,
+          token_budget: 3000, run_judge: false,
         }),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

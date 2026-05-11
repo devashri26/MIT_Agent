@@ -12,7 +12,7 @@ def generate_answer(
     grounded_context: GroundedContext,
     model: str = "",
     temperature: float = 0.0,
-    max_tokens: int = 1500,
+    max_tokens: int = 500,
 ) -> tuple[str, str, str, int, int]:
     """Synchronous LLM call. Returns (answer_text, provider_name, model_used,
     input_tokens, output_tokens). Token counts let callers surface usage to the UI."""

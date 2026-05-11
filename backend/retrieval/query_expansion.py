@@ -26,6 +26,11 @@ SYNONYM_MAP: dict[str, list[str]] = {
     "school": ["department", "branch"],
     "ieee": ["ieee student branch"],
     "nss": ["national service scheme"],
+    # Common typos / abbreviations
+    "nac": ["naac"],
+    "naac": ["nac", "accreditation"],
+    "nba": ["nba accreditation"],
+    "cap": ["cet cell", "centralised admission process"],
 }
 
 
