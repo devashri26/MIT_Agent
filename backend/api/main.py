@@ -16,6 +16,7 @@ from backend.answering.grounded_answering import GroundedAnsweringService
 from backend.answering.models.answer import GroundedAnswer, LatencyBreakdown
 from backend.api.chat_models import AnswerRequest, CacheHitInfo, ChatRequest, ChatResponse
 from backend.api.chat_ui import CHAT_UI_HTML
+from backend.api.tts_service import DEFAULT_VOICE, synthesize_mp3
 from backend.cache.cache_router import CacheRouter
 from backend.cache.models.cache_entry import CacheStats
 from backend.cache.semantic_cache import SemanticCache
@@ -510,6 +511,15 @@ async def chat_provider() -> dict[str, str]:
     """What provider would `/chat` use right now? Lets the UI display 'gemini' vs 'mock'."""
     provider = get_provider()
     return {"provider": provider.name, "default_model": provider.default_model}
+
+
+@app.post("/tts")
+async def tts(payload: dict) -> StreamingResponse:
+    """Stream MP3 audio of `text` using Microsoft Edge's free neural TTS.
+    Body: {"text": "...", "voice": "en-IN-NeerjaNeural"} — voice is optional."""
+    text = (payload or {}).get("text", "")
+    voice = (payload or {}).get("voice") or DEFAULT_VOICE
+    return StreamingResponse(synthesize_mp3(text, voice), media_type="audio/mpeg")
 
 
 @app.get("/retrieval/inspect", response_class=HTMLResponse)

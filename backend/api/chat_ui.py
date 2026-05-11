@@ -56,9 +56,21 @@ CHAT_UI_HTML = """
     .empty .examples button:hover { background: #eef7ff; }
     .streaming-cursor { display: inline-block; width: 8px; height: 14px; background: var(--good); vertical-align: text-bottom; animation: blink 1s infinite; }
     @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+    .thinking { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-style: italic; font-size: 14px; }
+    .thinking-dots { display: inline-flex; gap: 4px; }
+    .thinking-dots span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; display: inline-block; animation: thinking-bounce 1.3s infinite ease-in-out both; }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes thinking-bounce { 0%, 80%, 100% { transform: scale(0.5); opacity: 0.35; } 40% { transform: scale(1); opacity: 1; } }
+    .thinking-verb { transition: opacity 0.25s ease-in-out; }
     details { font-size: 12px; color: var(--muted); margin-top: 8px; }
     details summary { cursor: pointer; }
     details pre { background: #fafaf8; padding: 8px; border-radius: 6px; font-size: 11px; overflow-x: auto; }
+    .mic-btn { background: white; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 10px 14px; font-size: 18px; cursor: pointer; }
+    .mic-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .mic-btn.recording { background: var(--bad); color: white; border-color: var(--bad); animation: micpulse 1.2s infinite; }
+    @keyframes micpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.55); } 50% { box-shadow: 0 0 0 10px rgba(192,57,43,0); } }
+    .speaking-pill { background: #16a085; color: white; }
   </style>
 </head>
 <body>
@@ -71,6 +83,16 @@ CHAT_UI_HTML = """
       <div class="toolbar">
         <label><input type="checkbox" id="streamToggle" checked /> stream tokens</label>
         <label title="Adds 1 extra Gemini call per non-streaming answer for hallucination detection. Off by default to save quota."><input type="checkbox" id="judgeToggle" /> run hallucination judge (extra call)</label>
+        <label id="voiceToggleLabel" title="Speak your question and have the assistant read the answer back aloud. Uses your browser's Web Speech API for input and Microsoft Edge's free neural TTS for the spoken reply."><input type="checkbox" id="voiceToggle" /> 🎤 voice mode</label>
+        <select id="voiceSelect" class="pill" style="display:none; cursor:pointer" title="Pick a neural voice (Microsoft Edge TTS — free, no API key)">
+          <option value="en-IN-NeerjaNeural">Neerja · Indian English (F)</option>
+          <option value="en-IN-PrabhatNeural">Prabhat · Indian English (M)</option>
+          <option value="en-US-AriaNeural">Aria · US English (F)</option>
+          <option value="en-US-GuyNeural">Guy · US English (M)</option>
+          <option value="en-US-JennyNeural">Jenny · US English (F)</option>
+          <option value="en-GB-SoniaNeural">Sonia · British English (F)</option>
+          <option value="en-GB-RyanNeural">Ryan · British English (M)</option>
+        </select>
         <span id="usageBadge" class="pill" title="Gemini calls/tokens consumed this browser session">calls 0 · tokens 0/0</span>
         <span style="flex:1"></span>
         <button class="pill" id="resetBtn" type="button">reset chat</button>
@@ -88,6 +110,7 @@ CHAT_UI_HTML = """
       </div>
       <div class="controls">
         <textarea id="input" placeholder="Ask a question… (Enter to send, Shift+Enter for newline)"></textarea>
+        <button id="micBtn" type="button" class="mic-btn" title="Click to speak (enable voice mode first)" style="display:none">🎤</button>
         <button id="sendBtn" type="button">Send</button>
       </div>
     </div>
@@ -124,9 +147,128 @@ CHAT_UI_HTML = """
     const previewOpenBtn = document.getElementById('previewOpenBtn');
     const previewFallbackEl = document.getElementById('previewFallback');
     const previewFallbackLink = document.getElementById('previewFallbackLink');
+    const voiceToggle = document.getElementById('voiceToggle');
+    const voiceToggleLabel = document.getElementById('voiceToggleLabel');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const micBtn = document.getElementById('micBtn');
     let sessionId = localStorage.getItem('chat_session_id') || null;
     let busy = false;
     let previewLoadTimer = null;
+
+    // --- Voice mode (browser-native Web Speech API; no backend changes) ---
+    // STT: SpeechRecognition picks up the question and feeds it into the existing send path.
+    // TTS: speechSynthesis reads the final answer aloud after streaming/sync completes.
+    const SpeechRecCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const synth = window.speechSynthesis || null;
+    let recognition = null;
+    let isListening = false;
+
+    if (!SpeechRecCtor) {
+      voiceToggle.disabled = true;
+      voiceToggleLabel.title = 'Speech recognition not supported in this browser. Try Chrome or Edge.';
+    }
+
+    // Active <audio> element for neural TTS playback. Tracked so a new turn can stop
+    // the previous reply mid-sentence.
+    let ttsAudio = null;
+    function stopSpeech() {
+      if (synth) synth.cancel();
+      if (ttsAudio) { try { ttsAudio.pause(); ttsAudio.src = ''; } catch {} ttsAudio = null; }
+    }
+
+    voiceToggle.addEventListener('change', () => {
+      const on = voiceToggle.checked;
+      micBtn.style.display = on ? 'inline-block' : 'none';
+      voiceSelect.style.display = on ? 'inline-block' : 'none';
+      if (!on) stopSpeech();
+      localStorage.setItem('voice_mode', on ? '1' : '0');
+    });
+    if (localStorage.getItem('voice_mode') === '1' && SpeechRecCtor) {
+      voiceToggle.checked = true;
+      micBtn.style.display = 'inline-block';
+      voiceSelect.style.display = 'inline-block';
+    }
+    const savedVoice = localStorage.getItem('voice_name');
+    if (savedVoice) voiceSelect.value = savedVoice;
+    voiceSelect.addEventListener('change', () => {
+      localStorage.setItem('voice_name', voiceSelect.value);
+    });
+
+    function getRecognizer() {
+      if (recognition || !SpeechRecCtor) return recognition;
+      recognition = new SpeechRecCtor();
+      recognition.lang = 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (e) => {
+        const transcript = (e.results[0] && e.results[0][0] && e.results[0][0].transcript) || '';
+        if (transcript) {
+          inputEl.value = transcript;
+          sendQuery();
+        }
+      };
+      recognition.onerror = (e) => {
+        console.warn('speech recognition error:', e.error);
+        isListening = false;
+        micBtn.classList.remove('recording');
+      };
+      recognition.onend = () => {
+        isListening = false;
+        micBtn.classList.remove('recording');
+      };
+      return recognition;
+    }
+
+    micBtn.addEventListener('click', () => {
+      const rec = getRecognizer();
+      if (!rec) return;
+      if (isListening) { rec.stop(); return; }
+      // Stop any ongoing readback so it doesn't bleed into the mic.
+      stopSpeech();
+      try { rec.start(); isListening = true; micBtn.classList.add('recording'); }
+      catch (err) { console.warn(err); }
+    });
+
+    function _fallbackSpeak(clean) {
+      if (!synth) return;
+      synth.cancel();
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.05;
+      utter.pitch = 1.0;
+      utter.lang = 'en-IN';
+      synth.speak(utter);
+    }
+
+    async function speakText(text) {
+      if (!voiceToggle.checked || !text) return;
+      const clean = String(text)
+        .replace(/\\[\\d+\\]/g, '')
+        .replace(/[•·]/g, ',')
+        .replace(/\\s+/g, ' ')
+        .trim();
+      if (!clean) return;
+      stopSpeech();
+      // Primary: Microsoft Edge neural TTS via our /tts endpoint (very human-sounding,
+      // free, no API key). Fallback: browser speechSynthesis if the request fails.
+      try {
+        const res = await fetch('/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: clean, voice: voiceSelect.value }),
+        });
+        if (!res.ok) throw new Error('tts http ' + res.status);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        ttsAudio = new Audio(url);
+        ttsAudio.onended = () => { URL.revokeObjectURL(url); ttsAudio = null; };
+        ttsAudio.onerror = () => { URL.revokeObjectURL(url); ttsAudio = null; _fallbackSpeak(clean); };
+        await ttsAudio.play();
+      } catch (err) {
+        console.warn('neural TTS failed, falling back to browser voice:', err);
+        _fallbackSpeak(clean);
+      }
+    }
 
     function showPreview(url) {
       if (!url) return;
@@ -220,7 +362,7 @@ CHAT_UI_HTML = """
     }
 
     function appendUser(content) {
-      if (emptyState) emptyState.remove();
+      if (emptyState && emptyState.parentNode) emptyState.remove();
       const div = document.createElement('div');
       div.className = 'msg user';
       div.innerHTML = `<div class="body">${escapeHtml(content)}</div>`;
@@ -228,13 +370,57 @@ CHAT_UI_HTML = """
       div.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
 
+    const GREETING_TEXT = 'Hi! How can I help you with MITAOE today?';
+
+    function appendGreeting() {
+      const div = document.createElement('div');
+      div.className = 'msg assistant';
+      div.innerHTML = `<div class="body">${escapeHtml(GREETING_TEXT)}</div>`;
+      // Insert above the empty-state example chips so the greeting is the first bubble.
+      if (emptyState && emptyState.parentNode === messagesEl) {
+        messagesEl.insertBefore(div, emptyState);
+      } else {
+        messagesEl.appendChild(div);
+      }
+      // Try to speak it. Browsers may block autoplay before any user interaction —
+      // that's expected and the bubble still shows; future utterances (after the
+      // user clicks send/mic/toggle) will play normally.
+      speakText(GREETING_TEXT);
+    }
+
+    const THINKING_VERBS = ['Thinking', 'Searching MITAOE', 'Reading sources', 'Drafting answer'];
+
     function appendAssistantPlaceholder() {
       const div = document.createElement('div');
       div.className = 'msg assistant';
-      div.innerHTML = `<div class="body"><span class="streaming-cursor"></span></div><div class="meta"></div>`;
+      div.innerHTML = `
+        <div class="body">
+          <span class="thinking">
+            <span class="thinking-dots"><span></span><span></span><span></span></span>
+            <span class="thinking-verb">${THINKING_VERBS[0]}…</span>
+          </span>
+        </div>
+        <div class="meta"></div>
+      `;
       messagesEl.appendChild(div);
       div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      // Rotate the verb every 1.5s so a slow request feels like progress, not a hang.
+      const verbEl = div.querySelector('.thinking-verb');
+      let i = 0;
+      div._thinkingTimer = setInterval(() => {
+        if (!verbEl.isConnected) { clearInterval(div._thinkingTimer); return; }
+        i = (i + 1) % THINKING_VERBS.length;
+        verbEl.style.opacity = '0';
+        setTimeout(() => { verbEl.textContent = THINKING_VERBS[i] + '…'; verbEl.style.opacity = '1'; }, 200);
+      }, 1500);
       return div;
+    }
+
+    function stopThinking(div) {
+      if (div && div._thinkingTimer) {
+        clearInterval(div._thinkingTimer);
+        div._thinkingTimer = null;
+      }
     }
 
     function renderAssistant(div, payload) {
@@ -289,6 +475,8 @@ CHAT_UI_HTML = """
       // the LLM didn't ground on.
       const url = firstCitedUrl(a.answer, a.citations) || ((a.citations || [])[0] || {}).source_url;
       if (url) showPreview(url);
+      if (!a.abstained) speakText(a.answer);
+      else speakText(a.abstention_reason || 'I could not find reliable information about that.');
     }
 
     // Click any citation (inline [N] pill or card) → preview that source page in the right pane.
@@ -306,6 +494,7 @@ CHAT_UI_HTML = """
       const query = inputEl.value.trim();
       if (!query) return;
       busy = true; sendBtn.disabled = true;
+      stopSpeech();  // stop any TTS readback from the previous turn
       inputEl.value = '';
       appendUser(query);
       const placeholder = appendAssistantPlaceholder();
@@ -316,6 +505,7 @@ CHAT_UI_HTML = """
           await syncQuery(query, placeholder);
         }
       } catch (err) {
+        stopThinking(placeholder);
         placeholder.className = 'msg abstain';
         placeholder.innerHTML = `<div class="body">Error: ${escapeHtml(err.message || String(err))}</div>`;
       } finally {
@@ -335,6 +525,7 @@ CHAT_UI_HTML = """
       const data = await response.json();
       sessionId = data.session_id;
       localStorage.setItem('chat_session_id', sessionId);
+      stopThinking(placeholder);
       renderAssistant(placeholder, data);
       updateUsage(data.answer && data.answer.usage);
     }
@@ -379,9 +570,11 @@ CHAT_UI_HTML = """
             sessionId = payload.session_id || sessionId;
             if (sessionId) localStorage.setItem('chat_session_id', sessionId);
           } else if (evtName === 'abstain') {
+            stopThinking(placeholder);
             placeholder.className = 'msg abstain';
             bodyEl.textContent = 'I could not find reliable information about that in the MITAOE data.';
             metaEl.innerHTML = `<span class="pill bad">abstained: ${escapeHtml(payload.reason || 'unknown')}</span>`;
+            speakText('I could not find reliable information about that in the MITAOE data.');
             return;
           } else if (evtName === 'rate_limit') {
             placeholder.className = 'msg abstain';
@@ -391,6 +584,7 @@ CHAT_UI_HTML = """
           } else if (evtName === 'error') {
             throw new Error(payload.error || 'stream error');
           } else if (payload.delta) {
+            stopThinking(placeholder);
             buffer += payload.delta;
             const liveCits = metaInfo.citations || [];
             bodyEl.innerHTML = renderAnswerText(buffer, liveCits) + '<span class="streaming-cursor"></span>';
@@ -430,12 +624,15 @@ CHAT_UI_HTML = """
             }
             // Streaming endpoint doesn't surface token counts; count 1 call (plus 1 if rewritten).
             updateUsage({ total_calls: 1 + (metaInfo.was_rewritten ? 1 : 0) });
+            speakText(buffer);
           }
         }
       }
     }
 
     async function resetChat() {
+      stopSpeech();
+      if (recognition && isListening) recognition.stop();
       if (sessionId) {
         try { await fetch(`/conversation/${sessionId}`, { method: 'DELETE' }); } catch {}
       }
@@ -443,7 +640,11 @@ CHAT_UI_HTML = """
       localStorage.removeItem('chat_session_id');
       messagesEl.innerHTML = '';
       messagesEl.appendChild(emptyState);
+      appendGreeting();
     }
+
+    // Greet on first load.
+    appendGreeting();
   </script>
 </body>
 </html>
