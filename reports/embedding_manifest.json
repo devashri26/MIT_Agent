@@ -1,17 +1,17 @@
 {
   "embedding_model": "BAAI/bge-small-en-v1.5",
   "embedding_dimension": 384,
-  "total_eligible_chunks": 1308,
-  "total_embedded": 1308,
-  "skipped_reusable_components": 547,
-  "skipped_contaminated": 38,
+  "total_eligible_chunks": 1407,
+  "total_embedded": 1407,
+  "skipped_reusable_components": 444,
+  "skipped_contaminated": 42,
   "skipped_cta_heavy": 0,
   "skipped_boilerplate_heavy": 0,
-  "cache_hits": 0,
-  "embedded_at": "2026-05-11T11:45:18.443818+00:00",
+  "cache_hits": 1305,
+  "embedded_at": "2026-05-11T20:07:51.905629+00:00",
   "output_path": "datasets/embedded_chunks.jsonl",
   "skip_reason_distribution": {
-    "reusable_component": 547,
-    "cross_domain_contamination": 38
+    "reusable_component": 444,
+    "cross_domain_contamination": 42
   }
 }

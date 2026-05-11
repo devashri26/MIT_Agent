@@ -21,7 +21,51 @@ COMPONENT_PATTERNS: list[tuple[str, str]] = [
 ]
 
 
+# Paragraphs matching these patterns are ACADEMIC content (fee tables, eligibility
+# criteria, faculty bios, curriculum, placement stats) that legitimately appear in many
+# program pages by design. Per Phase 3 spec: "NEVER suppress academic information,
+# eligibility content, faculty data, curriculum, research content, placement statistics".
+PRESERVED_CONTENT_PATTERNS = [
+    # Fee tables / tuition (the BTech fee bug that motivated this list)
+    r"\btuition fees?\b",
+    r"\bdevelopment fees?\b",
+    r"\buniversity fees?\b",
+    r"\bfee structure\b",
+    r"₹\s*\d",
+    r"\brs\.?\s*\d{4,}",
+    r"\b\d{1,3}\s*,\s*\d{2,3}\s*,\s*\d{2,3}\b",
+    # Eligibility / admission criteria
+    r"\beligibility (?:criteria|requirements?|for)\b",
+    r"\bminimum (?:qualification|percentage|aggregate|marks)\b",
+    r"\bentrance exam(?:ination)?\b|\bgate score\b|\bjee main\b|\bmht[- ]cet\b|\bcet score\b",
+    # Curriculum / academic structure
+    r"\bsemester\s*\d\b|\bcredit hours?\b|\bcore courses?\b|\belective courses?\b",
+    r"\bcourse structure\b|\bsyllabus\b|\bscheme\b",
+    # Faculty bios
+    r"\bph\.?d\.?\b.{0,30}(?:from|in|at)",
+    r"\bresearch interests?\s*:",
+    r"\bteaching experience\b|\bindustry experience\b",
+    # Placement stats
+    r"\b\d+(?:\.\d+)?\s*lpa\b",
+    r"\bhighest package\b|\baverage package\b|\bplacement (?:statistics|offers?|cell)\b",
+    # Hostel / facilities
+    r"\bhostel (?:rooms?|fees?|charges?|facilities|accommodation)\b",
+]
+
+
+def is_preserved_content(text: str) -> bool:
+    """High-value academic content that must never be flagged as a reusable component
+    even when it appears in many documents. The Phase 3 spec explicitly forbids
+    suppressing this kind of content."""
+    if not text:
+        return False
+    lower = text.lower()
+    return any(re.search(pattern, lower) for pattern in PRESERVED_CONTENT_PATTERNS)
+
+
 def classify_component_type(text: str) -> str | None:
+    if is_preserved_content(text):
+        return None
     lower = (text or "").lower()
     for pattern, component_type in COMPONENT_PATTERNS:
         if re.search(pattern, lower):
@@ -41,6 +85,10 @@ def classify_registry(
     counts: dict[str, int] = {}
     for fingerprint in registry.reusable_fingerprints(min_doc_count=min_doc_count):
         text = registry.text_for(fingerprint)
+        if is_preserved_content(text):
+            # Academic content (fee tables, eligibility, faculty bios, etc.) legitimately
+            # repeats across program pages — leave it unflagged so retrieval can find it.
+            continue
         component_type = classify_component_type(text) or "boilerplate"
         registry.set_component_type(fingerprint, component_type)
         counts[component_type] = counts.get(component_type, 0) + 1
@@ -57,11 +105,16 @@ def assess_chunk_components(
 
     Returns (is_reusable_component, dominant_component_type, sorted_component_types_present).
     A chunk is reusable when ≥ suppress_threshold of its character mass is in classified
-    component paragraphs.
+    component paragraphs — UNLESS the chunk contains academic content (fees, eligibility,
+    faculty bios, etc.) anywhere, in which case it is never marked reusable. The fee-table
+    chunks have boilerplate around them ("submit applications to the authorities…") that
+    dominates by character mass; we still want the fee data retrievable.
     """
     paragraphs = split_paragraphs(chunk_text, min_chars=min_paragraph_chars)
     if not paragraphs:
         return False, None, []
+
+    has_preserved = any(is_preserved_content(p) for p in paragraphs)
 
     component_chars = 0
     total_chars = sum(len(paragraph) for paragraph in paragraphs)
@@ -72,6 +125,10 @@ def assess_chunk_components(
         if component_type:
             component_chars += len(paragraph)
             type_counter[component_type] = type_counter.get(component_type, 0) + 1
+
+    if has_preserved:
+        # Spare the chunk from reusable-component flagging — academic content is present.
+        return False, None, sorted(type_counter.keys())
 
     ratio = component_chars / total_chars if total_chars else 0.0
     if ratio >= suppress_threshold and type_counter:

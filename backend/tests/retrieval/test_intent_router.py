@@ -58,3 +58,28 @@ def test_general_query_fallback() -> None:
     route = IntentRouter().route("MITAOE Alandi Pune")
     assert route.intent == "general_query"
     assert "Admissions" in route.allowed_page_types
+
+
+def test_dean_routes_to_faculty_with_wider_page_types() -> None:
+    """Regression: 'dean of internship and placement cell' was routing to placement_query
+    which restricts to page_type=Placements. The leadership info actually lives on
+    General/Programs pages, so a dean/director query must now route to faculty_query
+    with broader allowed page_types."""
+    route = IntentRouter().route("who is the dean of internship and placement cell")
+    assert route.intent == "faculty_query"
+    assert "Faculty" in route.allowed_page_types
+    assert "Programs" in route.allowed_page_types
+    assert "General" in route.allowed_page_types
+
+
+def test_director_also_routes_to_faculty() -> None:
+    route = IntentRouter().route("who is director of mitaoe")
+    assert route.intent == "faculty_query"
+
+
+def test_placement_query_still_works_without_leadership_words() -> None:
+    """Regression check: a plain placement query (no dean/director) must still hit
+    placement_query, not faculty_query."""
+    route = IntentRouter().route("mechanical placement statistics")
+    assert route.intent == "placement_query"
+    assert route.allowed_page_types == ["Placements"]

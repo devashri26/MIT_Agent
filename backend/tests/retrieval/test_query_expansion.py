@@ -29,3 +29,22 @@ def test_expansion_handles_empty() -> None:
     original, expanded = expand_query("")
     assert original == []
     assert expanded == []
+
+
+def test_expansion_maps_dean_to_head_director() -> None:
+    """Regression: 'dean of placement' couldn't find Dr. Hemant Mali whose title is
+    'Head' not 'Dean'. Synonym expansion now bridges the vocabulary gap."""
+    _, expanded = expand_query("dean")
+    assert "head" in expanded
+    assert "director" in expanded
+
+
+def test_expansion_maps_fees_to_tuition() -> None:
+    _, expanded = expand_query("fees structure")
+    assert "tuition" in expanded
+    assert "cost" in expanded
+
+
+def test_expansion_maps_department_to_school() -> None:
+    _, expanded = expand_query("computer department")
+    assert "school" in expanded

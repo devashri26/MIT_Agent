@@ -36,23 +36,28 @@ _INTENT_RULES: list[tuple[str, str, list[str], list[str]]] = [
         ["Admissions", "Programs"],
         ["fees", "admissions"],
     ),
-    (
-        r"\bplacements?\b|\brecruiters?\b|\bpackage\b|\blpa\b|\bctc\b|\bhighest package\b|\bsalary\b",
-        "placement_query",
-        ["Placements"],
-        ["placements", "statistics"],
-    ),
+    # Club names (IEEE, NSS, "student branch") come first — specific clubs beat the
+    # generic faculty pattern when both could match (e.g. "IEEE coordinator").
     (
         r"\bclubs?\b|\bsociet(y|ies)\b|\bcommittees?\b|\bieee\b|\bnss\b|\bstudent branch\b",
         "club_query",
         ["Club"],
         ["clubs"],
     ),
+    # Faculty/leadership comes BEFORE placement so "dean of placement" routes to a person
+    # search across Faculty/Programs/General pages, not to the (narrow) Placements filter.
+    # Dean/Director/Principal/HOD all match leadership queries.
     (
-        r"\bfaculty\b|\bprofessor\b|\bhod\b|\bcoordinator\b|\bteaching staff\b",
+        r"\bdeans?\b|\bdirector(?:s|ate)?\b|\bprincipal\b|\bchairman\b|\bchairperson\b|\bhod\b|\bfaculty\b|\bprofessor\b|\bcoordinator\b|\bteaching staff\b",
         "faculty_query",
-        ["Faculty"],
-        ["faculty"],
+        ["Faculty", "Programs", "General"],
+        ["faculty", "overview"],
+    ),
+    (
+        r"\bplacements?\b|\brecruiters?\b|\bpackage\b|\blpa\b|\bctc\b|\bhighest package\b|\bsalary\b",
+        "placement_query",
+        ["Placements"],
+        ["placements", "statistics"],
     ),
     (
         r"\bhostel\b|\baccommodation\b|\bresidential\b|\blibrary\b|\blab(oratory|s)?\b|\bfacilities\b|\binfrastructure\b|\bsports\b",

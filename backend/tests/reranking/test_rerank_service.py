@@ -63,6 +63,32 @@ def test_rerank_marks_duplicates_in_rejected(fake_reranker) -> None:
     assert duplicate.rejection_reason.startswith("duplicate_of")
 
 
+def test_rerank_does_not_cap_overview_section_type(fake_reranker) -> None:
+    """Regression: 82% of the corpus has section_type='overview' (Phase 2 default).
+    The diversity cap was rejecting most overview chunks, which destroyed retrieval for
+    queries where most candidates shared section_type=overview. The cap must NOT apply
+    to the meta-default 'overview'/'general' section types."""
+    service = RerankService(model=fake_reranker)
+    # Unique-text chunks all tagged section_type=overview from different documents.
+    candidates = [
+        _chunk("o1", "MCA eligibility requires a relevant undergraduate bachelor degree", section_type="overview", document_id="d1"),
+        _chunk("o2", "Entrance exam scores from PERA CET MAH MCA test accepted criteria", section_type="overview", document_id="d2"),
+        _chunk("o3", "Reservation categories government norms determine the cutoff intake", section_type="overview", document_id="d3"),
+        _chunk("o4", "Documentation needed transcripts certificates passport ID verification process", section_type="overview", document_id="d4"),
+        _chunk("o5", "Age limit twenty eight years for unreserved category applying candidates", section_type="overview", document_id="d5"),
+    ]
+    kept, rejected = service.rerank(
+        "MCA eligibility entrance exam reservation",
+        candidates,
+        top_k=5,
+        max_per_section_type=2,
+    )
+    # All 5 overview chunks should survive — neither section nor document caps apply.
+    section_rejects = [r for r in rejected if r.rejection_reason and "section_type_saturated" in r.rejection_reason]
+    assert section_rejects == [], f"overview must be exempt, got: {section_rejects}"
+    assert len(kept) == 5
+
+
 def test_rerank_diversity_caps_per_section(fake_reranker) -> None:
     service = RerankService(model=fake_reranker)
     candidates = [

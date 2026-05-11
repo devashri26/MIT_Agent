@@ -11,6 +11,9 @@ STATS_MARKERS = [
     r"\b\d+\s*%",
     r"\b\d+(\.\d+)?\s*lpa\b",
     r"₹\s*\d",
+    r"\brs\.?\s*\d{4,}",
+    # Indian number format in MITAOE fee tables: '1, 52, 173.00' or '22,827'
+    r"\b\d{1,3}\s*,\s*\d{2,3}\s*,\s*\d{2,3}\b",
     r"\b\d{4}\s*[-–]\s*\d{4}\b",
     r"\btotal[: ]+\d",
 ]
@@ -24,6 +27,13 @@ FACTUAL_KEYWORDS = [
     r"\bhostel\b|\baccommodation\b",
     r"\bplaced\b|\brecruiters?\b",
     r"\bduration\b|\bintake\b|\bdeadline\b",
+]
+# Strong indicators that a chunk contains an actual fee TABLE (not just a fee mention).
+# These get an extra boost so concrete fee data beats marketing pages about fees.
+FEE_TABLE_MARKERS = [
+    r"\btuition fees?\b",
+    r"\bdevelopment fees?\b",
+    r"\buniversity fees?\b",
 ]
 
 # Downrank signals — marketing fluff and CTA chrome.
@@ -62,6 +72,8 @@ def compute_answerability_score(text: str, token_count: int | None = None) -> fl
     boosts += 0.15 if _count_matches(TABLE_MARKERS, sample) else 0.0
     boosts += min(0.25, 0.08 * _count_matches(STATS_MARKERS, sample))
     boosts += min(0.30, 0.07 * _count_matches(FACTUAL_KEYWORDS, sample))
+    # Fee-table chunks need extra weight so concrete numbers beat marketing prose.
+    boosts += min(0.20, 0.10 * _count_matches(FEE_TABLE_MARKERS, sample))
 
     penalties = 0.0
     cta_hits = _count_matches(CTA_PATTERNS, sample)

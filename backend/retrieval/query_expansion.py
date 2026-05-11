@@ -3,11 +3,14 @@ import regex as re
 
 SYNONYM_MAP: dict[str, list[str]] = {
     "eligibility": ["requirements", "criteria", "qualification", "minimum"],
-    "fees": ["tuition", "cost", "charges"],
+    "fees": ["tuition", "cost", "charges", "structure"],
+    "fee": ["tuition", "cost", "charges"],
+    "tuition": ["fees", "cost"],
     "scholarship": ["financial aid", "stipend"],
     "placement": ["recruitment", "package", "lpa", "ctc"],
     "hostel": ["accommodation", "residential"],
     "faculty": ["professor", "teaching staff"],
+    "professor": ["faculty", "instructor"],
     "curriculum": ["syllabus", "course structure", "scheme"],
     "club": ["society", "committee"],
     "research": ["publication", "patent", "journal"],
@@ -15,6 +18,12 @@ SYNONYM_MAP: dict[str, list[str]] = {
     "mtech": ["m.tech", "master of technology"],
     "mca": ["master of computer applications"],
     "hod": ["head of department"],
+    "dean": ["head", "director"],
+    "head": ["dean", "director"],
+    "director": ["dean", "head"],
+    "principal": ["dean", "head", "director"],
+    "department": ["school", "branch", "dept"],
+    "school": ["department", "branch"],
     "ieee": ["ieee student branch"],
     "nss": ["national service scheme"],
 }

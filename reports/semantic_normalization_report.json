@@ -1,8 +1,8 @@
 {
   "total_chunks": 1893,
-  "reusable_components_detected": 547,
+  "reusable_components_detected": 444,
   "component_type_distribution": {
-    "boilerplate": 128,
+    "boilerplate": 116,
     "faq_widget": 3
   },
   "contaminated_chunks": 131,

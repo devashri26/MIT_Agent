@@ -230,8 +230,8 @@ CHAT_UI_HTML = """
       const response = await fetch('/chat', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          query, session_id: sessionId, top_k: 5, candidate_pool: 20,
-          token_budget: 2000, run_judge: judgeToggle.checked,
+          query, session_id: sessionId, top_k: 7, candidate_pool: 20,
+          token_budget: 5000, run_judge: judgeToggle.checked,
         }),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -250,8 +250,8 @@ CHAT_UI_HTML = """
       const response = await fetch('/chat/stream', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          query, session_id: sessionId, top_k: 5, candidate_pool: 20,
-          token_budget: 2000, run_judge: false,
+          query, session_id: sessionId, top_k: 7, candidate_pool: 20,
+          token_budget: 5000, run_judge: false,
         }),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
