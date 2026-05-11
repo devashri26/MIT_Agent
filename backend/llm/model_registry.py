@@ -4,6 +4,7 @@ import os
 
 
 DEFAULT_MODELS: dict[str, str] = {
+    "groq": "llama-3.3-70b-versatile",
     "gemini": "gemini-2.5-flash",
     "anthropic": "claude-sonnet-4-6",
     "openai": "gpt-4.1-mini",
@@ -11,7 +12,9 @@ DEFAULT_MODELS: dict[str, str] = {
 }
 
 
+# Order matters — first provider with a key set in env wins when LLM_PROVIDER isn't explicit.
 PROVIDER_ENV_VARS: dict[str, str] = {
+    "groq": "GROQ_API_KEY",
     "gemini": "GOOGLE_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "openai": "OPENAI_API_KEY",
@@ -19,7 +22,7 @@ PROVIDER_ENV_VARS: dict[str, str] = {
 
 
 DEFAULT_PROVIDER_ENV_VAR = "LLM_PROVIDER"
-DEFAULT_PROVIDER = "gemini"
+DEFAULT_PROVIDER = "groq"
 
 
 def resolve_default_provider() -> str:

@@ -8,6 +8,10 @@ _provider_cache: dict[str, BaseLLMProvider] = {}
 
 
 def _construct(name: str) -> BaseLLMProvider:
+    if name == "groq":
+        from backend.llm.groq_provider import GroqProvider
+
+        return GroqProvider()
     if name == "gemini":
         from backend.llm.gemini_provider import GeminiProvider
 

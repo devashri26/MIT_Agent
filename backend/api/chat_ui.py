@@ -104,7 +104,7 @@ CHAT_UI_HTML = """
       providerBadge.textContent = `provider: ${info.provider} (${info.default_model})`;
       if (info.provider === 'mock') {
         providerBadge.style.color = '#f39c12';
-        providerBadge.title = 'No API key set. Export GOOGLE_API_KEY (or add it to .env) and restart to use Gemini.';
+        providerBadge.title = 'No API key set. Add GROQ_API_KEY (recommended, free tier 14,400 RPD) or GOOGLE_API_KEY to .env and restart.';
       }
     }).catch(() => { providerBadge.textContent = 'provider: unknown'; });
 
@@ -175,11 +175,20 @@ CHAT_UI_HTML = """
       if ((a.grounding_warnings || []).length) {
         metaParts.push(`<span class="pill warn">⚠ ${escapeHtml(a.grounding_warnings.join('; '))}</span>`);
       }
+      const lat = a.latency || {};
+      const latencyParts = [];
+      if (lat.total_ms != null) latencyParts.push(`total ${Math.round(lat.total_ms)}ms`);
+      if (lat.rewrite_ms != null) latencyParts.push(`rewrite ${Math.round(lat.rewrite_ms)}ms`);
+      if (lat.retrieval_ms != null) latencyParts.push(`retrieval ${Math.round(lat.retrieval_ms)}ms`);
+      if (lat.llm_generate_ms != null) latencyParts.push(`llm ${Math.round(lat.llm_generate_ms)}ms`);
+      if (lat.judge_ms != null) latencyParts.push(`judge ${Math.round(lat.judge_ms)}ms`);
+      if (latencyParts.length) metaParts.push(`<span class="pill" title="time spent in each stage">${latencyParts.join(' · ')}</span>`);
       const debug = `
         <details>
           <summary>debug</summary>
           <pre>${escapeHtml(JSON.stringify({
             provider: a.provider, model: a.model,
+            latency_ms: lat,
             used_chunks: a.used_chunks,
             unsupported_claims: a.hallucination?.unsupported_claims || [],
             judge_error: a.hallucination?.judge_error || null,
@@ -275,6 +284,11 @@ CHAT_UI_HTML = """
             placeholder.className = 'msg abstain';
             bodyEl.textContent = 'I could not find reliable information about that in the MITAOE data.';
             metaEl.innerHTML = `<span class="pill bad">abstained: ${escapeHtml(payload.reason || 'unknown')}</span>`;
+            return;
+          } else if (evtName === 'rate_limit') {
+            placeholder.className = 'msg abstain';
+            const body = placeholder.querySelector('.body');
+            body.innerHTML = `<b>Gemini rate limit hit.</b> ${escapeHtml(payload.error || '')}`;
             return;
           } else if (evtName === 'error') {
             throw new Error(payload.error || 'stream error');

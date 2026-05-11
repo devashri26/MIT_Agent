@@ -49,7 +49,7 @@ class GeminiProvider(BaseLLMProvider):
                 config=self._config(request),
             )
         except Exception as exc:
-            raise ProviderError(self.name, str(exc), exc) from exc
+            raise ProviderError(self.name, _friendly_error(exc), exc) from exc
 
         text = response.text or ""
         usage = getattr(response, "usage_metadata", None)
@@ -70,7 +70,7 @@ class GeminiProvider(BaseLLMProvider):
                 config=self._config(request),
             )
         except Exception as exc:
-            raise ProviderError(self.name, str(exc), exc) from exc
+            raise ProviderError(self.name, _friendly_error(exc), exc) from exc
         text = response.text or ""
         usage = getattr(response, "usage_metadata", None)
         return LLMResponse(
@@ -95,4 +95,21 @@ class GeminiProvider(BaseLLMProvider):
                     yield LLMStreamChunk(delta=delta, done=False)
             yield LLMStreamChunk(delta="", done=True, finish_reason="stop")
         except Exception as exc:
-            raise ProviderError(self.name, str(exc), exc) from exc
+            raise ProviderError(self.name, _friendly_error(exc), exc) from exc
+
+
+def _friendly_error(exc: Exception) -> str:
+    """Map common Gemini SDK errors to short human-readable strings the UI can show."""
+    text = str(exc)
+    lower = text.lower()
+    if "429" in text or "resource_exhausted" in lower or "rate" in lower and "limit" in lower:
+        return (
+            "Gemini rate limit hit (HTTP 429). Free tier is 10 RPM / 250 RPD on "
+            "gemini-2.5-flash — wait ~60s, switch to gemini-2.5-flash-lite, or set "
+            "LLM_PROVIDER=mock to test without quota."
+        )
+    if "401" in text or "permission_denied" in lower or "api key" in lower:
+        return "Gemini auth failed (HTTP 401). Check GOOGLE_API_KEY in your .env."
+    if "404" in text:
+        return f"Gemini model not found: {text}"
+    return text

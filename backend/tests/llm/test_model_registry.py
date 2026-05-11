@@ -11,7 +11,7 @@ from backend.llm.model_registry import (
 
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch):
-    for var in ("LLM_PROVIDER", "GOOGLE_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"):
+    for var in ("LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"):
         monkeypatch.delenv(var, raising=False)
 
 
@@ -29,6 +29,11 @@ def test_resolve_default_provider_uses_key_when_present(monkeypatch) -> None:
     assert resolve_default_provider() == "anthropic"
 
 
+def test_resolve_default_provider_picks_groq_when_key_present(monkeypatch) -> None:
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    assert resolve_default_provider() == "groq"
+
+
 def test_resolve_default_model_has_entries_for_each_provider() -> None:
-    for provider in ["gemini", "anthropic", "openai", "mock"]:
+    for provider in ["groq", "gemini", "anthropic", "openai", "mock"]:
         assert resolve_default_model(provider) == DEFAULT_MODELS[provider]

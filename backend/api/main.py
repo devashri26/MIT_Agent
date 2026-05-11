@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 
 from backend.answering.followup_resolution import resolve_followup_query
 from backend.answering.grounded_answering import GroundedAnsweringService
-from backend.answering.models.answer import GroundedAnswer
+from backend.answering.models.answer import GroundedAnswer, LatencyBreakdown
 from backend.api.chat_models import AnswerRequest, ChatRequest, ChatResponse
 from backend.api.chat_ui import CHAT_UI_HTML
 from backend.config.settings import settings
@@ -156,19 +156,27 @@ async def context_build(request: ContextBuildRequest) -> GroundedContext:
     )
 
 
-def _build_grounded_context_for(request: AnswerRequest) -> GroundedContext:
+def _retrieve_and_build_context(request: AnswerRequest):
+    """One retrieval+rerank+context pass. Returns (grounded_context, reranked_response) so
+    the caller can use both without re-running the heavy cross-encoder."""
     reranked = _get_reranked().search(
         query=request.query,
         top_k=request.top_k,
         candidate_pool=request.candidate_pool,
         include_components=request.include_components,
     )
-    return build_grounded_context(
+    grounded_context = build_grounded_context(
         query=request.query,
         intent=reranked.intent,
         reranked=reranked.results,
         token_budget=request.token_budget,
     )
+    return grounded_context, reranked
+
+
+def _build_grounded_context_for(request: AnswerRequest) -> GroundedContext:
+    grounded_context, _ = _retrieve_and_build_context(request)
+    return grounded_context
 
 
 def _build_answering_service(request: AnswerRequest) -> GroundedAnsweringService:
@@ -189,16 +197,21 @@ async def answer(request: AnswerRequest) -> GroundedAnswer:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
+    import time as _time
+
+    t_total = _time.perf_counter()
     session_id = ensure_session_id(request.session_id)
     state = _conversation_memory.append_user_turn(session_id, request.query)
     provider = get_provider(request.provider)
 
+    t_rewrite = _time.perf_counter()
     resolved_query, was_rewritten = resolve_followup_query(
         provider=provider,
         query=request.query,
         state=state,
         model=request.model or "",
     )
+    rewrite_ms = (_time.perf_counter() - t_rewrite) * 1000 if was_rewritten else None
 
     answer_request = AnswerRequest(
         query=resolved_query,
@@ -210,24 +223,45 @@ async def chat(request: ChatRequest) -> ChatResponse:
         provider=request.provider,
         model=request.model,
     )
-    grounded_context = _build_grounded_context_for(answer_request)
 
-    reranked_response = _get_reranked().search(
-        query=resolved_query,
-        top_k=request.top_k,
-        candidate_pool=request.candidate_pool,
-        include_components=request.include_components,
-    )
+    t_retrieval = _time.perf_counter()
+    grounded_context, reranked_response = _retrieve_and_build_context(answer_request)
+    retrieval_ms = (_time.perf_counter() - t_retrieval) * 1000
     routing_filters = {
         "page_types": list(reranked_response.allowed_page_types),
         "section_types": list(reranked_response.allowed_section_types),
     }
 
     service = _build_answering_service(answer_request)
+    t_llm = _time.perf_counter()
     grounded_answer = service.answer(
         query=resolved_query,
         grounded_context=grounded_context,
         rewritten_query=resolved_query if was_rewritten else None,
+    )
+    llm_total_ms = (_time.perf_counter() - t_llm) * 1000
+    # Split LLM total into generate vs judge using the token counts (judge ran iff judge_used).
+    if grounded_answer.hallucination.judge_used:
+        # Approximate: judge tokens ≈ judge_input+output; split proportional to total.
+        judge_tokens = (
+            grounded_answer.usage.judge_input_tokens + grounded_answer.usage.judge_output_tokens
+        )
+        gen_tokens = (
+            grounded_answer.usage.input_tokens + grounded_answer.usage.output_tokens
+        )
+        denom = max(judge_tokens + gen_tokens, 1)
+        judge_ms = llm_total_ms * (judge_tokens / denom)
+        llm_generate_ms = llm_total_ms - judge_ms
+    else:
+        judge_ms = None
+        llm_generate_ms = llm_total_ms
+
+    grounded_answer.latency = LatencyBreakdown(
+        rewrite_ms=round(rewrite_ms, 1) if rewrite_ms is not None else None,
+        retrieval_ms=round(retrieval_ms, 1),
+        llm_generate_ms=round(llm_generate_ms, 1),
+        judge_ms=round(judge_ms, 1) if judge_ms is not None else None,
+        total_ms=round((_time.perf_counter() - t_total) * 1000, 1),
     )
 
     state = _conversation_memory.append_assistant_turn(
@@ -298,8 +332,10 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             for chunk in provider.stream(llm_request):
                 yield to_sse_line(chunk)
         except Exception as exc:
-            err_payload = {"error": str(exc)}
-            yield b"event: error\ndata: " + json.dumps(err_payload).encode() + b"\n\n"
+            text = str(exc)
+            kind = "rate_limit" if "rate limit" in text.lower() or "429" in text else "error"
+            err_payload = {"error": text, "kind": kind}
+            yield (b"event: " + kind.encode() + b"\ndata: " + json.dumps(err_payload).encode() + b"\n\n")
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 

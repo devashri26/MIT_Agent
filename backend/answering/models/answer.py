@@ -37,6 +37,16 @@ class TokenUsage(BaseModel):
     total_calls: int = 0
 
 
+class LatencyBreakdown(BaseModel):
+    """Milliseconds spent in each stage. None means the stage didn't run that turn."""
+    rewrite_ms: float | None = None
+    retrieval_ms: float | None = None
+    context_build_ms: float | None = None
+    llm_generate_ms: float | None = None
+    judge_ms: float | None = None
+    total_ms: float = 0.0
+
+
 class GroundedAnswer(BaseModel):
     query: str
     answer: str
@@ -51,6 +61,7 @@ class GroundedAnswer(BaseModel):
     provider: str = ""
     model: str = ""
     usage: TokenUsage = Field(default_factory=TokenUsage)
+    latency: LatencyBreakdown = Field(default_factory=LatencyBreakdown)
 
 
 ABSTENTION_TEXT = "I could not find reliable information about that in the MITAOE data."
