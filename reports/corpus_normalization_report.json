@@ -1,0 +1,43 @@
+{
+  "total_chunks": 1893,
+  "page_type_distribution": {
+    "General": 304,
+    "Notices": 2,
+    "Admissions": 128,
+    "Programs": 798,
+    "Facilities": 36,
+    "Research": 25,
+    "Club": 109,
+    "Events": 8,
+    "Placements": 11,
+    "Blog": 446,
+    "Faculty": 22,
+    "Curriculum": 4
+  },
+  "section_type_distribution": {
+    "overview": 1553,
+    "research": 43,
+    "clubs": 5,
+    "facilities": 22,
+    "general": 211,
+    "admissions": 13,
+    "placements": 22,
+    "curriculum": 4,
+    "faq": 9,
+    "statistics": 3,
+    "faculty": 4,
+    "fees": 1,
+    "internships": 2,
+    "syllabus": 1
+  },
+  "quality_flag_distribution": {
+    "weak_classification": 304,
+    "event_page": 10,
+    "low_content": 241,
+    "duplicate": 209,
+    "non_canonical": 16
+  },
+  "canonical_pages": 911,
+  "non_canonical_pages": 16,
+  "weak_classifications": 304
+}

@@ -1,0 +1,30 @@
+{
+  "total_chunks": 1893,
+  "reusable_components_detected": 547,
+  "component_type_distribution": {
+    "boilerplate": 128,
+    "faq_widget": 3
+  },
+  "contaminated_chunks": 131,
+  "contamination_source_distribution": {
+    "off_topic:clubs": 4,
+    "off_topic:placements": 62,
+    "off_topic:internships": 63,
+    "off_topic:faculty": 10,
+    "off_topic:curriculum": 5,
+    "off_topic:faq": 18,
+    "faq_widget": 6,
+    "off_topic:admissions": 17,
+    "off_topic:fees": 2,
+    "off_topic:facilities": 12,
+    "off_topic:events": 6,
+    "off_topic:research": 11,
+    "off_topic:contact": 1,
+    "off_topic:overview": 6,
+    "off_topic:statistics": 2
+  },
+  "mixed_topic_chunks": 132,
+  "hierarchy_sections_extracted": 1893,
+  "generic_overview_sections_replaced": 1227,
+  "semantic_sections_created": 1586
+}

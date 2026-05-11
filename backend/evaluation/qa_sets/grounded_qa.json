@@ -1,0 +1,74 @@
+[
+  {
+    "id": "qa_001",
+    "query": "What is MCA eligibility?",
+    "intent": "eligibility_query",
+    "expected_source_url_substrings": ["mca", "admissions", "Admissions"],
+    "expected_keywords": ["eligibility", "graduation", "entrance"],
+    "expected_abstention": false,
+    "notes": "Should ground on the MCA admissions page; expected to cite admissions/MCA URLs."
+  },
+  {
+    "id": "qa_002",
+    "query": "What is the fee structure for BTech?",
+    "intent": "fees_query",
+    "expected_source_url_substrings": ["btech", "fees", "Admissions"],
+    "expected_keywords": ["fee", "tuition", "structure"],
+    "expected_abstention": false,
+    "notes": "Should ground on BTech admissions/fees page."
+  },
+  {
+    "id": "qa_003",
+    "query": "What are the placement statistics for Mechanical Engineering?",
+    "intent": "placement_query",
+    "expected_source_url_substrings": ["placement", "mechanical"],
+    "expected_keywords": ["placement", "package", "recruiter"],
+    "expected_abstention": false,
+    "notes": "Should ground on placements page; mechanical-specific stats if available."
+  },
+  {
+    "id": "qa_004",
+    "query": "What hostel facilities are available?",
+    "intent": "hostel_query",
+    "expected_source_url_substrings": ["hostel"],
+    "expected_keywords": ["hostel", "accommodation", "facility"],
+    "expected_abstention": false,
+    "notes": "Should ground on MITAOE Hostel page."
+  },
+  {
+    "id": "qa_005",
+    "query": "Who is the HOD of Computer Engineering?",
+    "intent": "faculty_query",
+    "expected_source_url_substrings": ["computer-engineering", "faculty", "hod"],
+    "expected_keywords": ["computer", "engineering"],
+    "expected_abstention": false,
+    "notes": "Should ground on the Computer Engineering department/faculty page."
+  },
+  {
+    "id": "qa_006",
+    "query": "What is the BTech curriculum for E&TC Engineering?",
+    "intent": "curriculum_query",
+    "expected_source_url_substrings": ["btech", "e&tc", "entc", "course-structure"],
+    "expected_keywords": ["curriculum", "semester", "credits"],
+    "expected_abstention": false,
+    "notes": "Should ground on the B.Tech E&TC course structure page."
+  },
+  {
+    "id": "qa_007",
+    "query": "Tell me about the IEEE student branch.",
+    "intent": "club_query",
+    "expected_source_url_substrings": ["club", "ieee"],
+    "expected_keywords": ["ieee", "club"],
+    "expected_abstention": false,
+    "notes": "Should ground on the IEEE student branch / clubs page. May abstain if corpus lacks an IEEE-specific page."
+  },
+  {
+    "id": "qa_008",
+    "query": "Who won the Nobel Prize in Physics last year?",
+    "intent": "general_query",
+    "expected_source_url_substrings": [],
+    "expected_keywords": [],
+    "expected_abstention": true,
+    "notes": "Out-of-corpus question — abstention is the correct behaviour."
+  }
+]

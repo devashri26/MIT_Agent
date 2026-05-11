@@ -2,6 +2,7 @@ from pathlib import Path
 
 import orjson
 
+from backend.retrieval.benchmark_metrics import compute_metrics
 from backend.retrieval.bm25_service import BM25RetrievalService
 
 
@@ -61,14 +62,21 @@ BENCHMARK_QUERIES = [
 
 def main() -> None:
     service = BM25RetrievalService()
-    output = []
-    for query in BENCHMARK_QUERIES:
-        response = service.search(query, top_k=5)
-        output.append(response.model_dump(mode="json"))
-    report_path = Path("reports/bm25_benchmark_results.json")
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_bytes(orjson.dumps(output, option=orjson.OPT_INDENT_2))
-    print(f"Wrote {len(output)} benchmark queries to {report_path}")
+    responses = [service.search(query, top_k=10) for query in BENCHMARK_QUERIES]
+
+    results_path = Path("reports/bm25_benchmark_results.json")
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    results_path.write_bytes(
+        orjson.dumps([r.model_dump(mode="json") for r in responses], option=orjson.OPT_INDENT_2)
+    )
+
+    metrics = compute_metrics(responses, service.chunks)
+    metrics_path = Path("reports/retrieval_metrics.json")
+    metrics_path.write_bytes(orjson.dumps(metrics, option=orjson.OPT_INDENT_2))
+
+    print(f"Wrote {len(responses)} benchmark queries to {results_path}")
+    print(f"Wrote retrieval metrics to {metrics_path}")
+    print(f"Overall: {metrics['overall']}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,569 @@
+{
+  "queries": 50,
+  "overall": {
+    "avg_grounding_confidence": 0.5567,
+    "avg_citation_coverage": 1.0,
+    "avg_distinct_section_types": 2.08,
+    "avg_context_tokens": 1448.14,
+    "fraction_low_confidence": 0.06
+  },
+  "per_query": [
+    {
+      "query": "What is MCA eligibility?",
+      "intent": "eligibility_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5382,
+      "grounding_warnings": [],
+      "total_tokens": 1328,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Who is faculty coordinator of IEEE?",
+      "intent": "club_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5229,
+      "grounding_warnings": [],
+      "total_tokens": 1601,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "What are hostel facilities?",
+      "intent": "hostel_query",
+      "context_blocks": 4,
+      "distinct_section_types": 3,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5129,
+      "grounding_warnings": [],
+      "total_tokens": 1938,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Mechanical placement statistics",
+      "intent": "placement_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.4896,
+      "grounding_warnings": [
+        "low_confidence:0.49<0.50"
+      ],
+      "total_tokens": 994,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "BTech AI curriculum",
+      "intent": "curriculum_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.6845,
+      "grounding_warnings": [],
+      "total_tokens": 406,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Computer Engineering course structure",
+      "intent": "curriculum_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.6322,
+      "grounding_warnings": [],
+      "total_tokens": 1061,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Information Technology syllabus",
+      "intent": "curriculum_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5935,
+      "grounding_warnings": [],
+      "total_tokens": 1324,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Chemical engineering faculty profile",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5255,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Civil engineering placements",
+      "intent": "placement_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.505,
+      "grounding_warnings": [],
+      "total_tokens": 1346,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "What is admission process?",
+      "intent": "general_query",
+      "context_blocks": 6,
+      "distinct_section_types": 4,
+      "distinct_documents": 5,
+      "grounding_confidence": 0.5111,
+      "grounding_warnings": [],
+      "total_tokens": 1841,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "What entrance exams are accepted?",
+      "intent": "general_query",
+      "context_blocks": 4,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5129,
+      "grounding_warnings": [],
+      "total_tokens": 1928,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "What is the fee structure?",
+      "intent": "fees_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.6179,
+      "grounding_warnings": [],
+      "total_tokens": 1259,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Hostel rules and accommodation",
+      "intent": "hostel_query",
+      "context_blocks": 3,
+      "distinct_section_types": 3,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5127,
+      "grounding_warnings": [],
+      "total_tokens": 1946,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Library facilities",
+      "intent": "hostel_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.548,
+      "grounding_warnings": [],
+      "total_tokens": 1606,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Research publications computer engineering",
+      "intent": "research_query",
+      "context_blocks": 5,
+      "distinct_section_types": 4,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5532,
+      "grounding_warnings": [],
+      "total_tokens": 1354,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "IEEE student branch coordinator",
+      "intent": "club_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 5,
+      "grounding_confidence": 0.5036,
+      "grounding_warnings": [],
+      "total_tokens": 1763,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "NSS activities",
+      "intent": "club_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.513,
+      "grounding_warnings": [],
+      "total_tokens": 1533,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Entrepreneurship development cell",
+      "intent": "general_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 5,
+      "grounding_confidence": 0.5835,
+      "grounding_warnings": [],
+      "total_tokens": 1654,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Mechanical engineering labs",
+      "intent": "hostel_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.512,
+      "grounding_warnings": [],
+      "total_tokens": 1826,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "AI ML department curriculum",
+      "intent": "curriculum_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 1,
+      "grounding_confidence": 0.6573,
+      "grounding_warnings": [],
+      "total_tokens": 918,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Data Science department",
+      "intent": "general_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.6344,
+      "grounding_warnings": [],
+      "total_tokens": 1530,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Placement highest package",
+      "intent": "placement_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5733,
+      "grounding_warnings": [],
+      "total_tokens": 994,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Internship policy",
+      "intent": "general_query",
+      "context_blocks": 4,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5316,
+      "grounding_warnings": [],
+      "total_tokens": 1617,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Academic calendar",
+      "intent": "general_query",
+      "context_blocks": 5,
+      "distinct_section_types": 4,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5527,
+      "grounding_warnings": [],
+      "total_tokens": 1957,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Exam timetable",
+      "intent": "general_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5065,
+      "grounding_warnings": [],
+      "total_tokens": 1500,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "PhD admission eligibility",
+      "intent": "eligibility_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5359,
+      "grounding_warnings": [],
+      "total_tokens": 1480,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "MTech programs",
+      "intent": "general_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.6523,
+      "grounding_warnings": [],
+      "total_tokens": 1452,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "BTech information technology",
+      "intent": "general_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5709,
+      "grounding_warnings": [],
+      "total_tokens": 1411,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Faculty qualification mechanical",
+      "intent": "eligibility_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5662,
+      "grounding_warnings": [],
+      "total_tokens": 1078,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Civil engineering infrastructure",
+      "intent": "hostel_query",
+      "context_blocks": 5,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5053,
+      "grounding_warnings": [],
+      "total_tokens": 1754,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Scholarship details",
+      "intent": "fees_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5182,
+      "grounding_warnings": [],
+      "total_tokens": 1410,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "International internship",
+      "intent": "general_query",
+      "context_blocks": 5,
+      "distinct_section_types": 4,
+      "distinct_documents": 5,
+      "grounding_confidence": 0.5764,
+      "grounding_warnings": [],
+      "total_tokens": 1541,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Anti ragging committee",
+      "intent": "club_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.4976,
+      "grounding_warnings": [
+        "low_confidence:0.50<0.50"
+      ],
+      "total_tokens": 1918,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Grievance redressal",
+      "intent": "general_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5452,
+      "grounding_warnings": [],
+      "total_tokens": 1637,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Student clubs",
+      "intent": "club_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.6038,
+      "grounding_warnings": [],
+      "total_tokens": 822,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Cultural events",
+      "intent": "event_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 1,
+      "grounding_confidence": 0.5482,
+      "grounding_warnings": [],
+      "total_tokens": 1276,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Sports facilities",
+      "intent": "hostel_query",
+      "context_blocks": 4,
+      "distinct_section_types": 3,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5161,
+      "grounding_warnings": [],
+      "total_tokens": 1924,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Alumni association",
+      "intent": "general_query",
+      "context_blocks": 4,
+      "distinct_section_types": 3,
+      "distinct_documents": 4,
+      "grounding_confidence": 0.5769,
+      "grounding_warnings": [],
+      "total_tokens": 1585,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Training and placement cell",
+      "intent": "placement_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5786,
+      "grounding_warnings": [],
+      "total_tokens": 994,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Recruiters visiting campus",
+      "intent": "placement_query",
+      "context_blocks": 4,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.4906,
+      "grounding_warnings": [
+        "low_confidence:0.49<0.50"
+      ],
+      "total_tokens": 994,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Computer engineering HOD",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5572,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Mechanical engineering HOD",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5523,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Chemical engineering HOD",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5562,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Electronics engineering HOD",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.559,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Information technology HOD",
+      "intent": "faculty_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5617,
+      "grounding_warnings": [],
+      "total_tokens": 1412,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Board of studies computer engineering",
+      "intent": "general_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.6232,
+      "grounding_warnings": [],
+      "total_tokens": 1963,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Curriculum semester 1",
+      "intent": "curriculum_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5987,
+      "grounding_warnings": [],
+      "total_tokens": 1335,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Honours minor degree",
+      "intent": "general_query",
+      "context_blocks": 2,
+      "distinct_section_types": 1,
+      "distinct_documents": 2,
+      "grounding_confidence": 0.5115,
+      "grounding_warnings": [],
+      "total_tokens": 1195,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Industry 4.0 blog",
+      "intent": "general_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.5179,
+      "grounding_warnings": [],
+      "total_tokens": 1378,
+      "citation_coverage": 1.0
+    },
+    {
+      "query": "Alandi engineering college",
+      "intent": "general_query",
+      "context_blocks": 3,
+      "distinct_section_types": 2,
+      "distinct_documents": 3,
+      "grounding_confidence": 0.6862,
+      "grounding_warnings": [],
+      "total_tokens": 1564,
+      "citation_coverage": 1.0
+    }
+  ],
+  "notes": "Context assembled from top-5 reranked candidates with 2000-token budget."
+}
