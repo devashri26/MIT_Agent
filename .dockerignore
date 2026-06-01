@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Development / OS
+.DS_Store
+.git/
+.gitignore
+.gitattributes
+
+# IDE / tooling
+.claude/
+.pytest_cache/
+.vscode/
+.idea/
+
+# Test artifacts
+datasets/test_processed_documents.json
+datasets/test_processed_documents.ndjson
+datasets/test_bm25_chunks.jsonl
+reports/test/
+
+# Secrets — never bake into image; inject via Render env vars
+.env
+
+# Raw scrape input (not needed at runtime)
+dataset_website-content-crawler_*.csv
+
+# Docs (not needed in image)
+*.md
+rules_for_coding.md
+Project_context.md

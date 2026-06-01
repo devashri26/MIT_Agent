@@ -17,7 +17,7 @@ class RerankedRetrievalService:
         self,
         hybrid: HybridRetrievalService | None = None,
         reranker_model: object | None = None,
-        candidate_pool: int = 20,
+        candidate_pool: int = 10,
         rerank_model_name: str = DEFAULT_RERANKER_MODEL,
     ) -> None:
         self.hybrid = hybrid or HybridRetrievalService()

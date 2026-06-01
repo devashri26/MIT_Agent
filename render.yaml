@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mitaoe-assistant
+    runtime: docker
+    # Render builds from the Dockerfile in the repo root
+    dockerfilePath: ./Dockerfile
+    # Free tier: 512 MB RAM — upgrade to "standard" for the full model stack
+    # The embedding model + reranker + BM25 index needs ~1.5 GB; use at least "starter"
+    plan: starter
+    # Render sets PORT automatically; our CMD reads it
+    healthCheckPath: /docs
+    envVars:
+      # --- LLM provider keys: set these in the Render dashboard, NOT here ---
+      # Add GROQ_API_KEY, GOOGLE_API_KEY, etc. as secret env vars in the dashboard.
+      # The app auto-selects the provider based on which key is present.
+      - key: LLM_PROVIDER
+        value: groq          # change to: gemini | anthropic | openai | mock
+      - key: APP_ENV
+        value: production

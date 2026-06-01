@@ -1,17 +1,36 @@
+# Secrets
 .env
+
+# Python
 *.pyc
+*.pyo
+*.pyd
 __pycache__/
+*.egg-info/
+.eggs/
+.pytest_cache/
+
+# Virtual environments
 .venv/
 venv/
-node_modules/
-dist/
+env/
+
+# OS
 .DS_Store
-vector_store/faiss_index/*.json
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# Uploads
 backend/uploads/
-*.egg-info/
-.pytest_cache/
-pytest-cache-files-*/
+
+# Test artifacts
 datasets/test_processed_documents.json
 datasets/test_processed_documents.ndjson
-reports/test/
 datasets/test_bm25_chunks.jsonl
+reports/test/
+
+# Qdrant lock file (runtime-only, causes permission errors on Windows)
+datasets/qdrant_storage/.lock
